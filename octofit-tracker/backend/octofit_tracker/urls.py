@@ -13,16 +13,26 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 from django.contrib import admin
 from django.urls import path
 from octofit_tracker import views
 
+def get_api_url(request, endpoint):
+    codespace_name = os.environ.get('CODESPACE_NAME')
+    if codespace_name:
+        base_url = f'https://{codespace_name}-8000.app.github.dev/api/'
+    else:
+        base_url = request.build_absolute_uri('/api/')
+    return base_url + endpoint
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.api_root, name='api-root'),
-    path('users/', views.user_list, name='user-list'),
-    path('teams/', views.team_list, name='team-list'),
-    path('activities/', views.activity_list, name='activity-list'),
-    path('leaderboard/', views.leaderboard_list, name='leaderboard-list'),
-    path('workouts/', views.workout_list, name='workout-list'),
+    path('api/', views.api_root, name='api-root'),
+    path('api/users/', views.user_list, name='user-list'),
+    path('api/teams/', views.team_list, name='team-list'),
+    path('api/activities/', views.activity_list, name='activity-list'),
+    path('api/leaderboard/', views.leaderboard_list, name='leaderboard-list'),
+    path('api/workouts/', views.workout_list, name='workout-list'),
+    path('', views.api_root, name='api-root-redirect'),
 ]
